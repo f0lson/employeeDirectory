@@ -2,7 +2,7 @@
 // Variables
 //===========================================================
 const gallery = document.querySelector('#gallery');
-
+const modal = document.createElement('div');
 
 //===========================================================
 //  Fetch request
@@ -17,7 +17,7 @@ fetch('https://randomuser.me/api/?nat=us&results=12')
 
 const generateCards = ( data ) => {
     // iterate and create card for each employee
-    let cardHTML = ``;
+    let cardHTML = '';
     data.forEach( employee => {
         let firstName = employee.name.first;
         let lastName = employee.name.last;
@@ -28,6 +28,7 @@ const generateCards = ( data ) => {
         let address = employee.location.street;
         let cell = employee.cell;
         let birthday = employee.dob.date;
+        let zip = employee.location.postcode;
         cardHTML += `
             <div class="card">
                 <div class="card-img-container">
@@ -35,9 +36,10 @@ const generateCards = ( data ) => {
                 </div>
                 <div class="card-info-container">
                     <h3 id="name" class="card-name cap">${firstName} ${lastName}</h3>
-                    <p class="card-text">${email}</p>
-                    <p class="card-text cap">${city}, ${state}</p>
+                    <p class="card-text email">${email}</p>
                     <p class="address hidden">${address}</p>
+                    <p class="card-text cap city">${city}, ${state}</p>
+                    <p class="zip hidden"></p>
                     <p class="cell hidden">${cell}</p>
                     <p class="birthday hidden">${birthday}</p>
                 </div>
@@ -58,5 +60,36 @@ const generateCards = ( data ) => {
 
 const generateModal = ( info ) => {
     let name = info.querySelector('#name').textContent;
-    console.log(name);
+    let email = info.querySelector('.email').textContent;
+    let cell = info.querySelector('.cell').textContent;
+    let city = info.querySelector('.city').textContent;
+    let address = info.querySelector('.address').textContent;
+    let birthday = info.querySelector('.birthday').textContent;
+    let img = info.querySelector('.card-img').src;
+    let modalHTML = `
+        <div class="modal-container">
+            <div class="modal">
+                <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
+                <div class="modal-info-container">
+                    <img class="modal-img" src="${img}" alt="profile picture">
+                    <h3 id="name" class="modal-name cap">${name}</h3>
+                    <p class="modal-text">${email}</p>
+                    <p class="modal-text cap">${city}</p>
+                    <hr>
+                    <p class="modal-text">${cell}</p>
+                    <p class="modal-text">${address}</p>
+                    <p class="modal-text">Birthday: ${birthday}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    modal.innerHTML = modalHTML;
+    modal.style.display = 'block';
+    gallery.appendChild(modal);
+    console.log(modalHTML);
+
+    let close = modal.querySelector('#modal-close-btn');
+    close.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
 }
