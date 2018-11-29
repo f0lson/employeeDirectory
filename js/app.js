@@ -1,15 +1,19 @@
 //===========================================================
-// Variables
+// Global variables
 //===========================================================
+
 const gallery = document.querySelector('#gallery');
 const modal = document.createElement('div');
+
 
 //===========================================================
 //  Fetch request
 //===========================================================
+
 fetch('https://randomuser.me/api/?nat=us&results=12')
     .then( response => response.json() )
     .then( data => generateCards(data.results) )
+
 
 //===========================================================
 //  Helper functions
@@ -48,24 +52,29 @@ const generateCards = ( data ) => {
     }); // end forEach
     gallery.innerHTML = cardHTML;
 
+    // storing all cards in array
+    const cards = document.querySelectorAll('.card');
+
     // adding click listener for modal to generated cards
-    let cards = document.querySelectorAll('.card');
     cards.forEach( card => {
         card.addEventListener('click', (e) => {
             let cardClicked = e.target.closest('.card');
-            generateModal(cardClicked);
+            let cardsArray = Array.from(cards);
+            console.log( cardsArray.indexOf(cardClicked) );
+            generateModal(cardClicked, cardsArray);
         }); // end click
     }); // end forEach
+
 }
 
-const generateModal = ( info ) => {
-    let name = info.querySelector('#name').textContent;
-    let email = info.querySelector('.email').textContent;
-    let cell = info.querySelector('.cell').textContent;
-    let city = info.querySelector('.city').textContent;
-    let address = info.querySelector('.address').textContent;
-    let birthday = info.querySelector('.birthday').textContent;
-    let img = info.querySelector('.card-img').src;
+const generateModal = ( cardClicked, cardsArray ) => {
+    let name = cardClicked.querySelector('#name').textContent;
+    let email = cardClicked.querySelector('.email').textContent;
+    let cell = cardClicked.querySelector('.cell').textContent;
+    let city = cardClicked.querySelector('.city').textContent;
+    let address = cardClicked.querySelector('.address').textContent;
+    let birthday = cardClicked.querySelector('.birthday').textContent;
+    let img = cardClicked.querySelector('.card-img').src;
     let modalHTML = `
         <div class="modal-container">
             <div class="modal">
@@ -81,15 +90,48 @@ const generateModal = ( info ) => {
                     <p class="modal-text">Birthday: ${birthday}</p>
                 </div>
             </div>
+
+            <div class="modal-btn-container">
+                <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
+                <button type="button" id="modal-next" class="modal-next btn">Next</button>
+            </div>
         </div>
     `;
     modal.innerHTML = modalHTML;
     modal.style.display = 'block';
     gallery.appendChild(modal);
-    console.log(modalHTML);
 
+    // Modal button click handlers
     let close = modal.querySelector('#modal-close-btn');
+    let prevBtn = modal.querySelector('#modal-prev');
+    let nextBtn = modal.querySelector('#modal-next');
+
     close.addEventListener('click', () => {
-        modal.style.display = 'none';
+        if( modal.style.display === 'block' ) {
+            modal.style.display = 'none';
+        }
     });
+
+    prevBtn.addEventListener('click', () => {
+        if ( cardsArray.indexOf(cardClicked) > 0 ) {
+            let previousCard = cardsArray[cardsArray.indexOf(cardClicked) - 1];
+            generateModal(previousCard, cardsArray);
+        } else {
+            // go to last card
+            let previousCard = cardsArray[11];
+            generateModal(previousCard, cardsArray);
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if ( cardsArray.indexOf(cardClicked) < 11 ) {
+            let nextCard = cardsArray[cardsArray.indexOf(cardClicked) + 1]
+            generateModal(nextCard, cardsArray);
+        } else {
+            // go to first card
+            let nextCard = cardsArray[0];
+            generateModal(nextCard, cardsArray);
+        }
+    });
+
 }
