@@ -19,6 +19,7 @@ fetch('https://randomuser.me/api/?nat=us&results=12')
 //  Helper functions
 //===========================================================
 
+// generating the cards for the gallery
 const generateCards = ( data ) => {
     // iterate and create card for each employee
     let cardHTML = '';
@@ -32,6 +33,7 @@ const generateCards = ( data ) => {
         let address = employee.location.street;
         let cell = employee.cell;
         let birthday = employee.dob.date;
+        let slicedBirthday = birthday.slice(0, 10);
         let zip = employee.location.postcode;
         cardHTML += `
             <div class="card">
@@ -45,7 +47,7 @@ const generateCards = ( data ) => {
                     <p class="card-text cap city">${city}, ${state}</p>
                     <p class="zip hidden"></p>
                     <p class="cell hidden">${cell}</p>
-                    <p class="birthday hidden">${birthday}</p>
+                    <p class="birthday hidden">${slicedBirthday}</p>
                 </div>
             </div>
         `;
@@ -68,6 +70,7 @@ const generateCards = ( data ) => {
 }
 
 const generateModal = ( cardClicked, cardsArray ) => {
+    // grabbing info from clicked card
     let name = cardClicked.querySelector('#name').textContent;
     let email = cardClicked.querySelector('.email').textContent;
     let cell = cardClicked.querySelector('.cell').textContent;
@@ -86,7 +89,7 @@ const generateModal = ( cardClicked, cardsArray ) => {
                     <p class="modal-text cap">${city}</p>
                     <hr>
                     <p class="modal-text">${cell}</p>
-                    <p class="modal-text">${address}</p>
+                    <p class="modal-text cap">${address}</p>
                     <p class="modal-text">Birthday: ${birthday}</p>
                 </div>
             </div>
@@ -135,3 +138,35 @@ const generateModal = ( cardClicked, cardsArray ) => {
     });
 
 }
+
+//===========================================================
+//  Search functionality
+//===========================================================
+
+const searchContainer = document.querySelector('.search-container');
+const searchHTML = `
+    <form action="#" method="get">
+        <input type="search" id="search-input" class="search-input" placeholder="Search...">
+        <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+    </form>
+    `;
+
+searchContainer.innerHTML = searchHTML;
+const form = document.querySelector('form');
+const searchInput = document.querySelector('#search-input');
+const submit = document.querySelector('#search-submit');
+
+form.addEventListener('submit', () => {
+    let userSearch = searchInput.value.toLowerCase();
+    let cardsArray = document.querySelectorAll('.card');
+    cardsArray.forEach( card => {
+        let cardName = card.querySelector('#name').textContent.toLowerCase();
+        console.log(cardName);
+        if ( cardName.includes(userSearch) ) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    })
+    console.log(userSearch, cardsArray);
+});
